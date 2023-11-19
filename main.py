@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from numpy.random._examples.cython.extending import out
 from sklearn import model_selection, metrics, preprocessing
 import torch
 import torch.nn as nn
@@ -8,12 +7,12 @@ import matplotlib.pyplot as plt
 from torch.utils.data import Dataset, DataLoader
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-df = pd.read_csv("ml-lastest-small/ratings.csv")
+df = pd.read_csv("D:\HUTECH\Cac cuoc thi\HDBANK\ml-latest-small\ml-latest-small/ratings.csv")
 df.info()
 df.userId.nunique()
 df.movieId.nunique()
 df.rating.value_counts()
-df.shape
+
 
 
 # Tranning dataset Wrapper
@@ -43,18 +42,16 @@ class MovieDataset:
 class RecSysModel(nn.Module):
     def __init__(self, n_users, n_movies):
         super().__init__()
-
         self.user_embed = nn.Embedding(n_users, 32)
         self.movie_embed = nn.Embedding(n_movies, 32)
-
-        self.out = nn.Linear(4,1)
+        self.out = nn.Linear(64, 1)
 
     def forvard(self, users, movies, ratings = None):
         users_embeds = self.user_embed(users)
         movies_embeds = self.movie_embed(movies)
         output = torch.cat([users_embeds, movies_embeds], dim=1)
         output = self.out(output)
-        return  output
+        return output
 
 
 
@@ -101,7 +98,7 @@ model =  RecSysModel(
 ).to(device)
 
 optimizer = torch.optim.Adam(model.parameters())
-sch = torch.optim.lr_sheduler.StepLR(optimizer,step_size=3, gamma=0.7)
+sch = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.7)
 
 loss_func = nn.MSELoss()
 
@@ -120,8 +117,7 @@ print(dataloader_data['movies'].size())
 
 user_emabed = nn.Embedding(len(lbl_user.classes_), 32)
 movie_embed = nn.Embedding(len(lbl_movie.classes_), 32)
-
-out == nn.Linear(64,1)
+out = nn.Linear(64,1)
 
 
 
@@ -253,7 +249,7 @@ with torch.no_grad():
         n_rel_k = sum((est >= threshold) for (est, _) in user_ratings[:k])
         n_rel_and_rec_k = sum(
             ((true_r >= threshold) and(est >= threshold))
-            for(est, true_r) is user_ratings[:k]
+            for (est, true_r) in user_ratings[:k]
         )
         print(f"uid {uid}, n_rel{n_rel}, n_rec_k {n_rel_k}, n_rel_and_rec_k {n_rel_and_rec_k} ")
 
